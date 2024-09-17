@@ -49,8 +49,8 @@ jobs:
       - name: Checkout s3-tests repository
         uses: actions/checkout@v3
         with:
-          repository: nspcc-dev/s3-tests
-          ref: master
+          repository: evgeniiz321/s3-tests
+          ref: update-skips-p8
           path: s3-tests
 
       - name: Checkout neofs-dev-env repository
@@ -384,3 +384,15 @@ jobs:
           state: 'success'
           sha: ${{github.event.pull_request.head.sha || github.sha}}
           target_url: https://${{ env.TEST_RESULTS_HTTP_GATE }}/${{ env.TEST_RESULTS_CID }}/${{ env.RUN_ID }}/data/containers_logs.zip
+
+      - name: Collect s3_gate logs
+        if: always()
+        run: |
+            docker logs s3_gate 2> s3_gate.log
+
+      - name: Archive gate logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: s3_gate_logs
+          path: s3_gate.log
